@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<script id="getUsername">
+</script>
+<section style="background-color: white;">
+<!--  <div class="container py-5">-->
+
+    <div class="row d-flex justify-content-center">
+      <div class="col-md-8 col-lg-6 col-xl-4">
+
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center p-3"
+               style="border-top: 4px solid #ffa900;">
+            <h5 class="mb-0">Chat messages</h5>
+            <div class="d-flex flex-row align-items-center">
+              <span class="badge bg-warning me-3">20</span>
+              <i class="fas fa-minus me-3 text-muted fa-xs"></i>
+              <i class="fas fa-comments me-3 text-muted fa-xs"></i>
+              <i class="fas fa-times text-muted fa-xs"></i>
+            </div>
+          </div>
+          <div id="messages-container" class="card-body" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px;   max-height: 500px;
+  overflow-y: scroll;">
+
+
+            <div class="message-box">
+                <div class="d-flex justify-content-between">
+                    <p class="small mb-1 text-muted">23 Jan 2:05 pm</p>
+                    <p class="small mb-1">Johny Bullock</p>
+                </div>
+                <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                    <div>
+                        <p class="small p-2 me-3 mb-3 text-white rounded-3 bg-warning">Thank you for your believe in
+                            our
+                            supports</p>
+
+                    </div>
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
+                         alt="avatar 1" style="width: 45px; height: 100%;">
+                </div>
+            </div>
+
+<!--            <div class="message-box">-->
+<!--                <div class="d-flex justify-content-between">-->
+<!--                    <p class="small mb-1">Username</p>-->
+<!--                    <p class="small mb-1 text-muted">Send Time</p>-->
+<!--                </div>-->
+<!--                <div class="d-flex flex-row justify-content-start">-->
+<!--                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp"-->
+<!--                         alt="avatar 1" style="width: 45px; height: 100%;">-->
+<!--                    <div>-->
+<!--                        <p class="small p-2 ms-3 mb-3 rounded-3" style="background-color: #f5f6f7;">Lorem ipsum dolor-->
+<!--                            Message</p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+
+
+
+          </div>
+          <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+            <form id="myForm" class="input-group mb-0">
+              <input type="text" class="form-control" placeholder="Type message" id="myInput"
+                     aria-label="Recipient's username" aria-describedby="button-addon2" />
+              <button class="btn btn-warning" type="submit" id="button-addon2" style="padding-top: .55rem;">
+                Submit
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+<!--  </div>-->
+</section>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+  const Button = document.getElementById('button-addon2');
+  const Form = document.getElementById('myForm');
+  const Input = document.getElementById('myInput');
+
+  var username = prompt('enter your name');
+
+  function newMyBox(usr,msg){
+      // اضافه کردن المان‌های داخلی به المان div
+      const messageBox = document.createElement('div');
+      messageBox.className = 'message-box';
+
+      const messageMeta = document.createElement('div');
+      messageMeta.className = 'd-flex justify-content-between';
+
+      const date = document.createElement('p');
+      date.className = 'small mb-1 text-muted';
+      const dat = new Date();
+      const time = dat.getHours() + ":" + dat.getMinutes();
+      date.innerText = time;
+      messageMeta.appendChild(date);
+
+      const sender = document.createElement('p');
+      sender.className = 'small mb-1';
+      sender.innerText = usr;
+      messageMeta.appendChild(sender);
+
+      const messageContent = document.createElement('div');
+      messageContent.className = 'd-flex flex-row justify-content-end mb-4 pt-1';
+
+      const message = document.createElement('div');
+      const messageText = document.createElement('p');
+      messageText.className = 'small p-2 me-3 mb-3 text-white rounded-3 bg-warning';
+      messageText.innerText = msg;
+      message.appendChild(messageText);
+      messageContent.appendChild(message);
+
+      const avatar = document.createElement('img');
+      avatar.src = 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp';
+      avatar.alt = 'avatar 1';
+      avatar.style.width = '45px';
+      avatar.style.height = '100%';
+      messageContent.appendChild(avatar);
+
+      messageBox.appendChild(messageMeta);
+      messageBox.appendChild(messageContent);
+
+      // الحاق المان div با کلاس message-box به المن DOM
+      const messagesContainer = document.getElementById("messages-container");
+      messagesContainer.appendChild(messageBox);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      return;
+  }
+  function newOtherBox(usr,msg){
+      // ساخت المان div با کلاس message-box
+      var messageBox = document.createElement('div');
+      messageBox.classList.add('message-box');
+
+      // اضافه کردن المان‌های داخلی به المان div
+      var header = document.createElement('div');
+      header.classList.add('d-flex', 'justify-content-between');
+
+      var username = document.createElement('p');
+      username.classList.add('small', 'mb-1');
+      username.innerText = usr;
+      header.appendChild(username);
+
+      var sendTime = document.createElement('p');
+      const date = new Date();
+      const time = date.getHours() + ":" + date.getMinutes();
+      sendTime.classList.add('small', 'mb-1', 'text-muted');
+      sendTime.innerText = time;
+      header.appendChild(sendTime);
+
+
+
+      var body = document.createElement('div');
+      body.classList.add('d-flex', 'flex-row', 'justify-content-start');
+      var avatar = document.createElement('img');
+      avatar.src = 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp';
+      avatar.alt = 'avatar 1';
+      avatar.style.width = '45px';
+      avatar.style.height = '100%';
+      body.appendChild(avatar);
+
+      var message = document.createElement('div');
+      var messageContent = document.createElement('p');
+      messageContent.classList.add('small', 'p-2', 'ms-3', 'mb-3', 'rounded-3');
+      messageContent.style.backgroundColor = '#f5f6f7';
+      messageContent.innerText = msg;
+      message.appendChild(messageContent);
+      body.appendChild(message);
+
+      messageBox.appendChild(header);
+      messageBox.appendChild(body);
+
+      // الحاق المان div با کلاس message-box به المن DOM
+      const messagesContainer = document.getElementById("messages-container");
+      messagesContainer.appendChild(messageBox);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      return;
+  }
+  Form.addEventListener('submit', (event) => {
+    event.preventDefault(); // جلوگیری از refresh شدن صفحه بعد از submit فرم
+    const message = Input.value; // گرفتن متنی که توسط کاربر در input وارد شده
+    const data = {
+      message: Input.value,
+      username: username
+    };
+    // ارسال داده به سرور توسط شیء socket
+    socket.emit('data', data);
+
+    Input.value = ''; // پاک کردن محتوای input بعد از submit کردن فرم
+
+  });
+  socket.on('mess' , mess => {
+      if(mess.username == username){
+          newMyBox(mess.username,mess.message);
+      }else{
+          newOtherBox(mess.username,mess.message);
+      }
+  });
+</script>
+</body>
+</html>
